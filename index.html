@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="DIVOC Graphics — Premium print, web, and art design studio based in Nairobi, Kenya.">
+  <meta name="keywords" content="graphic design, print design, web design, digital art, nairobi">
+  <meta name="author" content="DIVOC Graphics">
+  <meta property="og:title" content="DIVOC Graphics — Print. Web. Art.">
+  <meta property="og:description" content="Premium creative studio designing print, web, and digital art experiences.">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#0069c5">
+  
+  <title>DIVOC Graphics — Print. Web. Art.</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Serif+Display:ital@0;1&family=Lato:ital,wght@0,300;0,400;0,700;1,400&family=Space+Mono:ital@0;1&display=swap" rel="stylesheet">
+  
+  <!-- Leaflet CSS for map functionality -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  
+  <style>
+    :root {
+      --black: #000000;
+      --white: #ffffff;
+      --cream: #f0f4fa;
+      --accent: #0069c5;
+      --accent2: #004f96;
+      --mid: #0d0d0d;
+      --border: rgba(0,105,197,0.18);
+      --transition-fast: 0.15s ease;
+      --transition-normal: 0.3s ease;
+      --transition-smooth: 0.5s ease;
+    }
+
+    *, *::before, *::after { 
+      margin: 0; 
+      padding: 0; 
+      box-sizing: border-box; 
+    }
+
+    html { 
+      scroll-behavior: smooth; 
+    }
+
+    body {
+      background: var(--black);
+      color: var(--white);
+      font-family: 'Lato', Arial, sans-serif;
+      overflow-x: hidden;
+      cursor: none;
+      line-height: 1.6;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       CUSTOM CURSOR
+       ═══════════════════════════════════════════════════════════════════ */
+    .cursor {
+      width: 12px; 
+      height: 12px;
+      background: var(--accent);
+      border-radius: 50%;
+      position: fixed; 
+      top: 0; 
+      left: 0;
+      pointer-events: none;
+      z-index: 9999;
+      transition: transform var(--transition-fast), width 0.2s, height 0.2s;
+      mix-blend-mode: difference;
+    }
+
+    .cursor-ring {
+      width: 36px; 
+      height: 36px;
+      border: 1px solid var(--accent);
+      border-radius: 50%;
+      position: fixed; 
+      top: 0; 
+      left: 0;
+      pointer-events: none;
+      z-index: 9998;
+      transition: all 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+      mix-blend-mode: difference;
+    }
+
+    body:hover .cursor { 
+      opacity: 1; 
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       NAVIGATION
+       ═══════════════════════════════════════════════════════════════════ */
+    nav {
+      position: fixed; 
+      top: 0; 
+      left: 0; 
+      right: 0;
+      z-index: 100;
+      padding: 1.2rem 3rem;
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+      border-bottom: 2px solid var(--border);
+      backdrop-filter: blur(20px);
+      background: rgba(0,0,0,0.85);
+      transition: all var(--transition-normal);
+    }
+
+    nav:hover {
+      background: rgba(0,0,0,0.95);
+    }
+
+    .nav-logo {
+      text-decoration: none;
+      display: flex; 
+      align-items: center;
+      transition: transform var(--transition-normal);
+    }
+
+    .nav-logo:hover {
+      transform: scale(1.05);
+    }
+
+    .nav-logo img {
+      height: 60px;
+      width: auto;
+      display: block;
+      transition: all var(--transition-normal);
+    }
+
+    .nav-center {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.35rem;
+      margin-left: auto;
+    }
+
+    .nav-links {
+      display: flex; 
+      gap: 2.5rem; 
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: rgba(255,255,255,0.6);
+      text-decoration: none;
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      transition: color var(--transition-normal);
+    }
+
+    .nav-links a:hover {
+      color: var(--accent);
+    }
+
+    .nav-social {
+      display: flex;
+      gap: 0.7rem;
+      align-items: center;
+    }
+
+    .social-icon {
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      position: relative;
+    }
+
+    .social-icon:hover {
+      transform: translateY(-2px);
+      opacity: 1 !important;
+    }
+
+    .social-icon svg {
+      width: 16px;
+      height: 16px;
+      fill: var(--accent);
+      stroke: none;
+      transition: all var(--transition-smooth);
+    }
+
+    .social-icon.active svg {
+      opacity: 0;
+      transform: scale(0.5);
+    }
+
+    .social-icon .bulb {
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      opacity: 0;
+      transform: scale(0);
+      transition: all var(--transition-smooth);
+      animation: bulbPulse 0.6s ease forwards;
+    }
+
+    .social-icon.active .bulb {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       HERO SECTION
+       ═══════════════════════════════════════════════════════════════════ */
+    .hero-logo-large {
+      position: absolute;
+      right: -100px;
+      top: -50px;
+      width: 600px;
+      height: 600px;
+      opacity: 0.22;
+      z-index: 1;
+      transition: opacity var(--transition-normal);
+      pointer-events: none;
+    }
+
+    .hero-logo-large img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 20px 60px rgba(0,105,197,0.3));
+    }
+
+    .hero-logo-large.fade-out {
+      opacity: 0;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       FLOATING SOCIAL SIDEBAR
+       ═══════════════════════════════════════════════════════════════════ */
+    .floating-social {
+      position: fixed;
+      right: 2rem;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+      z-index: 50;
+      opacity: 1;
+      transition: all var(--transition-normal);
+    }
+
+    .floating-social.hide {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .floating-social-icon {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, rgba(0,105,197,0.2), rgba(0,105,197,0.1));
+      border: 2px solid var(--accent);
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all var(--transition-normal);
+      position: relative;
+      backdrop-filter: blur(10px);
+    }
+
+    .floating-social-icon:hover {
+      transform: scale(1.15);
+      opacity: 1 !important;
+      box-shadow: 0 8px 32px rgba(0,105,197,0.4);
+    }
+
+    .floating-social-icon svg {
+      width: 24px;
+      height: 24px;
+      stroke: var(--accent);
+      fill: none;
+      stroke-width: 1.5;
+      transition: all var(--transition-smooth);
+    }
+
+    .floating-social-icon.active svg {
+      opacity: 0;
+      transform: scale(0.5);
+    }
+
+    .floating-social-icon .bulb {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      opacity: 0;
+      transform: scale(0);
+      transition: all var(--transition-smooth);
+      animation: bulbPulse 0.6s ease forwards;
+    }
+
+    .floating-social-icon.active .bulb {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .floating-social-label {
+      position: absolute;
+      right: 60px;
+      background: rgba(0,0,0,0.8);
+      color: var(--accent);
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-family: 'Space Mono', monospace;
+      white-space: nowrap;
+      opacity: 0;
+      transition: all var(--transition-normal);
+      pointer-events: none;
+    }
+
+    .floating-social-icon:hover .floating-social-label {
+      opacity: 1;
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       SCROLL ARROW
+       ═══════════════════════════════════════════════════════════════════ */
+    .scroll-arrow {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 24px;
+      height: 24px;
+      z-index: 50;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      cursor: pointer;
+      animation: bounce 1.5s infinite;
+    }
+
+    .scroll-arrow.hide {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .scroll-arrow.pointing-up {
+      animation: bounce-up 1.5s infinite;
+    }
+
+    .scroll-arrow svg {
+      width: 100%;
+      height: 100%;
+      stroke: var(--accent);
+      stroke-width: 1.5;
+      fill: none;
+      stroke-linecap: round;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(8px); }
+    }
+
+    @keyframes bounce-up {
+      0%, 100% { transform: translateX(-50%) translateY(0) rotate(180deg); }
+      50% { transform: translateX(-50%) translateY(-8px) rotate(180deg); }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       LIGHTBOX
+       ═══════════════════════════════════════════════════════════════════ */
+    #divocLightbox {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    #divocLightbox.open {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .lb-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.9);
+      cursor: pointer;
+    }
+
+    .lb-frame {
+      position: relative;
+      z-index: 10;
+      max-width: 90vw;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      animation: popIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .lb-img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .lb-caption {
+      color: var(--white);
+      font-size: 0.9rem;
+      margin-top: 1.5rem;
+      text-align: center;
+      max-width: 600px;
+    }
+
+    .lb-close, .lb-nav {
+      position: absolute;
+      z-index: 15;
+      background: rgba(0, 0, 0, 0.7);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+    }
+
+    .lb-close:hover, .lb-nav:hover {
+      background: rgba(0, 0, 0, 0.9);
+      transform: scale(1.1);
+    }
+
+    .lb-close {
+      top: 1rem;
+      right: 1rem;
+      font-size: 1.5rem;
+    }
+
+    .lb-nav {
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 2rem;
+      padding: 0 1.5rem;
+    }
+
+    .lb-prev {
+      left: 1rem;
+    }
+
+    .lb-next {
+      right: 1rem;
+    }
+
+    .lb-counter {
+      position: absolute;
+      bottom: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.7);
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      font-family: 'Space Mono', monospace;
+    }
+
+    @keyframes popIn {
+      0% {
+        opacity: 0;
+        transform: scale(0.8);
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    @keyframes bulbPulse {
+      0% {
+        opacity: 0;
+        transform: scale(0);
+      }
+      50% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       CLIENTS HUB MODAL
+       ═══════════════════════════════════════════════════════════════════ */
+    #clientsHubModal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 180;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    #clientsHubModal.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    .hub-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      cursor: pointer;
+    }
+
+    .hub-panel {
+      position: relative;
+      z-index: 10;
+      background: rgba(0, 0, 0, 0.95);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 3rem;
+      max-width: 800px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      animation: slideUp 0.3s ease;
+    }
+
+    .hub-tag {
+      color: var(--accent);
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      font-family: 'Space Mono', monospace;
+    }
+
+    .hub-title {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      font-family: 'DM Serif Display', serif;
+    }
+
+    .hub-title em {
+      color: var(--accent);
+      font-style: italic;
+    }
+
+    .hub-subtitle {
+      color: rgba(255, 255, 255, 0.6);
+      margin-bottom: 2rem;
+      font-size: 0.95rem;
+    }
+
+    .hub-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .hub-client-card {
+      background: rgba(0, 105, 197, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+    }
+
+    .hub-client-card:hover {
+      background: rgba(0, 105, 197, 0.15);
+      border-color: var(--accent);
+      transform: translateY(-4px);
+    }
+
+    .hub-client-card.active-client {
+      border-color: var(--accent);
+      background: rgba(0, 105, 197, 0.2);
+    }
+
+    .hub-card-logo {
+      margin-bottom: 1rem;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .hub-card-logo img {
+      max-height: 100%;
+      max-width: 100%;
+      object-fit: contain;
+    }
+
+    .hub-card-name {
+      font-size: 1.2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .hub-card-desc {
+      font-size: 0.85rem;
+      color: rgba(255, 255, 255, 0.6);
+      margin-bottom: 1rem;
+    }
+
+    .hub-card-cta {
+      display: inline-block;
+      color: var(--accent);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 700;
+    }
+
+    .hub-close {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      background: none;
+      border: none;
+      color: var(--accent);
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .hub-close:hover {
+      transform: scale(1.2);
+    }
+
+    @keyframes slideUp {
+      0% {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       EARTH ZOOM MODAL (Leaflet Map)
+       ═══════════════════════════════════════════════════════════════════ */
+    #earthZoomModal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 160;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    #earthZoomModal.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+
+    #earthLeafletMap {
+      width: 100%;
+      height: 100%;
+      background: #1a1a2e;
+    }
+
+    .earth-hud-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 2rem;
+      z-index: 10;
+    }
+
+    .earth-hud-title {
+      color: var(--accent);
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+    }
+
+    .earth-close-btn {
+      position: absolute;
+      top: 2rem;
+      right: 2rem;
+      background: rgba(0, 0, 0, 0.7);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: all 0.3s ease;
+      pointer-events: all;
+    }
+
+    .earth-close-btn:hover {
+      background: rgba(0, 0, 0, 0.9);
+      transform: scale(1.1);
+    }
+
+    .earth-scanline {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 105, 197, 0.03),
+        rgba(0, 105, 197, 0.03) 1px,
+        transparent 1px,
+        transparent 2px
+      );
+      animation: scanlineMove 8s linear infinite;
+    }
+
+    .earth-hud-bottom {
+      display: flex;
+      justify-content: space-between;
+      gap: 2rem;
+    }
+
+    .earth-coords-hud,
+    .earth-stage-label {
+      background: rgba(0, 0, 0, 0.7);
+      border: 1px solid var(--accent);
+      border-radius: 6px;
+      padding: 1rem;
+      font-family: 'Space Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--accent);
+    }
+
+    .earth-coords-hud div,
+    .earth-stage-label div {
+      margin-bottom: 0.5rem;
+    }
+
+    .earth-coords-hud div:last-child,
+    .earth-stage-label div:last-child {
+      margin-bottom: 0;
+    }
+
+    .earth-stage-name {
+      color: rgba(0, 105, 197, 0.8);
+      margin-top: 0.5rem;
+    }
+
+    @keyframes scanlineMove {
+      0% { transform: translateY(0); }
+      100% { transform: translateY(10px); }
+    }
+
+    .earth-bihi-pin {
+      position: relative;
+    }
+
+    .pin-ring, .pin-ring2 {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border: 2px solid var(--accent);
+      border-radius: 50%;
+      animation: pinPulse 2s infinite;
+    }
+
+    .pin-ring {
+      width: 40px;
+      height: 40px;
+      animation-delay: 0s;
+    }
+
+    .pin-ring2 {
+      width: 60px;
+      height: 60px;
+      animation-delay: 0.3s;
+    }
+
+    .pin-dot {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 12px;
+      height: 12px;
+      background: var(--accent);
+      border-radius: 50%;
+      z-index: 2;
+    }
+
+    .pin-label {
+      position: absolute;
+      bottom: -50px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.9);
+      color: var(--accent);
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      font-size: 0.7rem;
+      white-space: nowrap;
+      font-family: 'Space Mono', monospace;
+      border: 1px solid var(--accent);
+    }
+
+    @keyframes pinPulse {
+      0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(1);
+      }
+      100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(1.5);
+      }
+    }
+
+    /* ═══════════════════════════════════════════════════════════════════
+       RESPONSIVE DESIGN
+       ═══════════════════════════════════════════════════════════════════ */
+    @media (max-width: 1024px) {
+      .hero-logo-large {
+        width: 450px;
+        height: 450px;
+        right: -60px;
+        top: -30px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      nav {
+        padding: 1rem 1.5rem;
+      }
+
+      .nav-logo img {
+        height: 45px;
+      }
+
+      .nav-links {
+        gap: 1.5rem;
+      }
+
+      .nav-center {
+        gap: 0.25rem;
+      }
+
+      .floating-social {
+        right: 1rem;
+      }
+
+      .hero-logo-large {
+        width: 300px;
+        height: 300px;
+        right: -50px;
+        top: -20px;
+      }
+
+      .hub-panel {
+        padding: 2rem;
+      }
+
+      .earth-hud-bottom {
+        flex-direction: column;
+      }
+    }
+
+    @media (max-width: 480px) {
+      nav {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+      }
+
+      .nav-center {
+        align-items: center;
+        margin-left: 0;
+      }
+
+      .nav-links {
+        gap: 1rem;
+        justify-content: center;
+      }
+
+      .floating-social {
+        right: 0.5rem;
+        gap: 1rem;
+      }
+
+      .floating-social-label {
+        display: none;
+      }
+
+      .hero-logo-large {
+        display: none;
+      }
+
+      .hub-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .scroll-arrow {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- CUSTOM CURSOR -->
+<div class="cursor" id="divocCursor"></div>
+<div class="cursor-ring" id="divocCursorRing"></div>
+
+<!-- NAVIGATION -->
+<nav>
+  <a href="#" class="nav-logo" title="DIVOC Graphics">
+    <span style="font-family: 'Bebas Neue'; font-size: 1.5rem; letter-spacing: 0.1em;">DIVOC</span>
+  </a>
+  
+  <div class="nav-center">
+    <ul class="nav-links">
+      <li><a href="#portfolio">Portfolio</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#about">About</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    
+    <div class="nav-social">
+      <div class="social-icon" onclick="toggleDarkMode()" title="Dark Mode">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1" x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1" y1="12" x2="3" y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+        </svg>
+        <div class="bulb">💡</div>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- FLOATING SOCIAL SIDEBAR -->
+<div class="floating-social" id="floatingSocial">
+  <div class="floating-social-icon" onclick="window.open('https://instagram.com', '_blank')" title="Instagram">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+      <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+      <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37Z" fill="black"/>
+      <circle cx="17.5" cy="6.5" r="1.5" fill="black"/>
+    </svg>
+    <span class="floating-social-label">Instagram</span>
+  </div>
+
+  <div class="floating-social-icon" onclick="window.open('https://twitter.com', '_blank')" title="Twitter">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+      <path d="M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2s9 5 20 5a9.5 9.5 0 00-9-5.5c4.75 2.25 7-7 7-7"/>
+    </svg>
+    <span class="floating-social-label">Twitter</span>
+  </div>
+
+  <div class="floating-social-icon" onclick="window.open('https://linkedin.com', '_blank')" title="LinkedIn">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+      <path d="M16 8a6 6 0 016 6v7h-4v-7a2 2 0 00-2-2 2 2 0 00-2 2v7h-4v-7a6 6 0 016-6zM2 9h4v12H2z"/>
+      <circle cx="4" cy="4" r="2"/>
+    </svg>
+    <span class="floating-social-label">LinkedIn</span>
+  </div>
+</div>
+
+<!-- SCROLL DIRECTION ARROW -->
+<div class="scroll-arrow" id="scrollArrow" title="Scroll">
+  <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+</div>
+
+<!-- LIGHTBOX -->
+<div id="divocLightbox">
+  <div class="lb-overlay" onclick="lbClose()"></div>
+  <div class="lb-frame">
+    <button class="lb-close" onclick="lbClose()" title="Close (Esc)">✕</button>
+    <button class="lb-prev" onclick="lbNav(-1)" title="Previous (←)">&#8249;</button>
+    <button class="lb-next" onclick="lbNav(1)" title="Next (→)">&#8250;</button>
+    <img class="lb-img" id="lbImg" src="" alt="Gallery image">
+    <div class="lb-caption" id="lbCaption"></div>
+    <div class="lb-counter" id="lbCounter"></div>
+  </div>
+</div>
+
+<!-- CLIENTS HUB MODAL -->
+<div id="clientsHubModal">
+  <div class="hub-overlay" onclick="closeClientsHub()"></div>
+  <div class="hub-panel">
+    <button class="hub-close" onclick="closeClientsHub()" title="Close">&#x2715;</button>
+    <p class="hub-tag">// 004 &mdash; OUR CLIENTS</p>
+    <h2 class="hub-title">Clients Who <em>Trust</em> Us</h2>
+    <p class="hub-subtitle">Select a client to explore their works</p>
+    <div class="hub-grid" id="hubGrid"></div>
+  </div>
+</div>
+
+<!-- EARTH ZOOM MODAL (Leaflet Map) -->
+<div id="earthZoomModal">
+  <div id="earthLeafletMap"></div>
+  <div class="earth-hud-overlay">
+    <div class="earth-hud-title">// DIVOC GRAPHICS STUDIO — LOCATION</div>
+    <button class="earth-close-btn" onclick="closeEarthZoom()" title="Close (Esc)">✕</button>
+    <div class="earth-scanline"></div>
+    <div class="earth-hud-bottom">
+      <div class="earth-coords-hud">
+        <div id="earthCoordDisplay">0°00'N  20°00'E</div>
+        <div id="earthAltDisplay">ALT: 36,000 km</div>
+      </div>
+      <div class="earth-stage-label">
+        <div id="earthStageLabel">SCANNING LOCATION</div>
+        <div class="earth-stage-name" id="earthStageName">EARTH ORBIT</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- LEAFLET JS for map -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+
+<!-- MAIN SCRIPT -->
+<script>
+  // ── CUSTOM CURSOR ──────────────────────────────────────────────────────────────
+  var divocCursor = document.getElementById('divocCursor');
+  var divocCursorRing = document.getElementById('divocCursorRing');
+
+  document.addEventListener('mousemove', function(e) {
+    divocCursor.style.left = e.clientX + 'px';
+    divocCursor.style.top = e.clientY + 'px';
+    divocCursorRing.style.left = (e.clientX - 18) + 'px';
+    divocCursorRing.style.top = (e.clientY - 18) + 'px';
+  });
+
+  document.addEventListener('mousedown', function() {
+    divocCursor.style.width = '8px';
+    divocCursor.style.height = '8px';
+    divocCursorRing.style.width = '32px';
+    divocCursorRing.style.height = '32px';
+  });
+
+  document.addEventListener('mouseup', function() {
+    divocCursor.style.width = '12px';
+    divocCursor.style.height = '12px';
+    divocCursorRing.style.width = '36px';
+    divocCursorRing.style.height = '36px';
+  });
+
+  // ── SCROLL ARROW ────────────────────────────────────────────────────────────────
+  var arrow = document.getElementById('scrollArrow');
+  var arrowHideTimer = null;
+  var lastScrollDir = null;
+
+  function updateArrow() {
+    var scrollY = window.scrollY;
+    var maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+    var dir = scrollY > (window.pageYOffset || 0) ? 'down' : 'up';
+
+    if (lastScrollDir !== dir) {
+      lastScrollDir = dir;
+      if (dir === 'up') {
+        arrow.classList.remove('pointing-up');
+      } else {
+        arrow.classList.add('pointing-up');
+      }
+    }
+
+    arrow.classList.remove('hide');
+
+    clearTimeout(arrowHideTimer);
+    if ((scrollY <= 0 && dir === 'up') || (scrollY >= maxScroll - 5 && dir === 'down')) {
+      arrowHideTimer = setTimeout(() => arrow.classList.add('hide'), 800);
+    } else {
+      arrowHideTimer = setTimeout(() => arrow.classList.add('hide'), 2500);
+    }
+  }
+
+  arrow.addEventListener('click', () => {
+    var scrollY = window.scrollY;
+    var maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+    if (arrow.classList.contains('pointing-up')) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else {
+      window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'smooth' });
+    }
+  });
+
+  window.addEventListener('scroll', updateArrow, { passive: true });
+  arrow.classList.add('hide');
+
+  // ── LIGHTBOX ────────────────────────────────────────────────────────────────────
+  var _lbItems = [];
+  var _lbIndex = 0;
+
+  function lbOpen(items, index) {
+    _lbItems = items;
+    _lbIndex = index;
+    lbShow();
+    document.getElementById('divocLightbox').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function lbShow() {
+    var item = _lbItems[_lbIndex];
+    var img  = document.getElementById('lbImg');
+    var cap  = document.getElementById('lbCaption');
+    var ctr  = document.getElementById('lbCounter');
+    img.src  = item.src;
+    img.alt  = item.caption;
+    cap.innerHTML = '<strong>' + item.caption + '</strong>' + (item.sub || '');
+    ctr.textContent = (_lbIndex + 1) + ' / ' + _lbItems.length;
+    var frame = document.querySelector('.lb-frame');
+    frame.style.animation = 'none';
+    frame.offsetHeight;
+    frame.style.animation = '';
+  }
+
+  function lbClose() {
+    document.getElementById('divocLightbox').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  function lbNav(dir) {
+    _lbIndex = (_lbIndex + dir + _lbItems.length) % _lbItems.length;
+    lbShow();
+  }
+
+  document.addEventListener('keydown', function(e) {
+    var lb = document.getElementById('divocLightbox');
+    if (!lb.classList.contains('open')) return;
+    if (e.key === 'ArrowRight') lbNav(1);
+    if (e.key === 'ArrowLeft')  lbNav(-1);
+    if (e.key === 'Escape')     lbClose();
+  });
+
+  // ── CLIENTS HUB ─────────────────────────────────────────────────────────────────
+  function openClientsHub(highlightClient) {
+    var hub = document.getElementById('clientsHubModal');
+    var grid = document.getElementById('hubGrid');
+    grid.innerHTML = '';
+
+    var clientBtns = document.querySelectorAll('[data-client]');
+    clientBtns.forEach(function(btn) {
+      var name = btn.getAttribute('data-client');
+      var logoImg = btn.querySelector('.client-logo-img');
+      var logoSrc = logoImg ? logoImg.src : '';
+
+      var card = document.createElement('div');
+      card.className = 'hub-client-card' + (name === highlightClient ? ' active-client' : '');
+
+      var logoHtml = logoSrc
+        ? '<div class="hub-card-logo"><img src="' + logoSrc + '" alt="' + name + ' logo" /></div>'
+        : '';
+
+      card.innerHTML = logoHtml +
+        '<h3 class="hub-card-name">' + name + '</h3>' +
+        '<span class="hub-card-cta">View works</span>';
+
+      card.addEventListener('click', function() {
+        closeClientsHub();
+      });
+      grid.appendChild(card);
+    });
+
+    hub.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeClientsHub() {
+    document.getElementById('clientsHubModal').classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') closeClientsHub();
+  });
+
+  // ── EARTH ZOOM MODAL (Leaflet satellite) ────────────────────────────────────────
+  var _earthTimers = [];
+
+  function openEarthZoom() {
+    var modal = document.getElementById('earthZoomModal');
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+
+    if (!window._leafletMap) {
+      window._leafletMap = L.map('earthLeafletMap', {
+        zoomControl: false, 
+        attributionControl: false,
+        zoomAnimation: true, 
+        fadeAnimation: true,
+        markerZoomAnimation: true
+      });
+      
+      L.tileLayer(
+        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        { maxZoom: 19, tileSize: 256 }
+      ).addTo(window._leafletMap);
+
+      var pinHTML = '<div class="earth-bihi-pin">' +
+        '<div style="position:relative;display:flex;align-items:center;justify-content:center;">' +
+        '<div class="pin-ring"></div><div class="pin-ring2"></div>' +
+        '<div class="pin-dot"></div></div>' +
+        '<div class="pin-label">BIHI TOWERS<br>14TH FLOOR<br>NAIROBI, KE</div></div>';
+      
+      var pinIcon = L.divIcon({ 
+        className: '', 
+        html: pinHTML, 
+        iconSize: [90, 70], 
+        iconAnchor: [45, 10] 
+      });
+      
+      window._leafletMarker = L.marker([-1.2901, 36.8288], { 
+        icon: pinIcon, 
+        opacity: 0 
+      }).addTo(window._leafletMap);
+    }
+
+    _earthTimers.forEach(function(t) { clearTimeout(t); });
+    _earthTimers = [];
+
+    window._leafletMap.setView([0, 20], 2, { animate: false });
+    window._leafletMap.invalidateSize();
+    if (window._leafletMarker) window._leafletMarker.setOpacity(0);
+
+    var BIHI = [-1.2901, 36.8288];
+    var stages = [
+      { t:600,  lat:-1.3,   lng:37,      zoom:4,  dur:2.5, stage:'APPROACHING AFRICA', name:'AFRICA REGION',  alt:'8,000 km',  coord:'1°18\'S  37°00\'E' },
+      { t:3400, lat:-1.28,  lng:36.85,   zoom:8,  dur:2.2, stage:'ENTERING KENYA',     name:'NAIROBI, KENYA', alt:'1,200 km',  coord:'1°16\'S  36°51\'E' },
+      { t:6000, lat:-1.294, lng:36.822,  zoom:13, dur:2.0, stage:'NAIROBI CBD',         name:'WESTLANDS',      alt:'200 km',    coord:'1°17\'38"S  36°49\'19"E' },
+      { t:8400, lat:BIHI[0],lng:BIHI[1], zoom:18, dur:1.8, stage:'DESTINATION REACHED', name:'BIHI TOWERS',   alt:'0.8 km',    coord:'1°17\'24"S  36°49\'44"E' }
+    ];
+
+    stages.forEach(function(s) {
+      var t = setTimeout(function() {
+        window._leafletMap.flyTo([s.lat, s.lng], s.zoom, { duration: s.dur, easeLinearity: 0.25 });
+        var cd = document.getElementById('earthCoordDisplay');
+        var ad = document.getElementById('earthAltDisplay');
+        var sl = document.getElementById('earthStageLabel');
+        var sn = document.getElementById('earthStageName');
+        if (cd) cd.textContent = s.coord;
+        if (ad) ad.textContent = 'ALT: ' + s.alt;
+        if (sl) sl.textContent = s.stage;
+        if (sn) sn.textContent = s.name;
+        if (s.zoom === 18) {
+          var pt = setTimeout(function() {
+            if (window._leafletMarker) window._leafletMarker.setOpacity(1);
+          }, s.dur * 1000 + 200);
+          _earthTimers.push(pt);
+        }
+      }, s.t);
+      _earthTimers.push(t);
+    });
+  }
+
+  function closeEarthZoom() {
+    document.getElementById('earthZoomModal').classList.remove('active');
+    document.body.style.overflow = '';
+    _earthTimers.forEach(function(t) { clearTimeout(t); });
+    _earthTimers = [];
+  }
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') { closeEarthZoom(); }
+  });
+
+  // ── THEME TOGGLE ────────────────────────────────────────────────────────────────
+  function toggleDarkMode() {
+    // Placeholder for dark mode toggle functionality
+    console.log('Dark mode toggle');
+  }
+</script>
+
+</body>
+</html>
